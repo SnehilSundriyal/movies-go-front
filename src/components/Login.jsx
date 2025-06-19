@@ -22,20 +22,38 @@ const Login = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(email, password);
 
-    if (email === "admin@example.com") {
-      setJwt("abc");
-      setAlert("Logged in successfully!", "alert-success", Check);
-
-      // Delay navigation to allow the alert to be visible
-      setTimeout(() => {
-        // Redirect to home page after successful login
-        navigate('/');
-      }, 2000);
-    } else {
-      setAlert("Invalid email", "alert-error", Cross);
+    let payload = {
+      email: email,
+      password: password,
     }
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: "include",
+      body: JSON.stringify(payload)
+    }
+
+    fetch(`http://localhost:8080/authenticate`, requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            setAlert("Invalid Email or Password", "alert-error", Cross)
+          } else {
+            setJwt(data.access_token)
+            setAlert("Logged in successfully!", "alert-success", Check)
+            setTimeout(() => {
+              navigate("/")
+            }, 2000)
+          }
+        })
+
+        .catch(error => {
+          setAlert("Unknown error occurred" + toString(error), "alert-danger", Cross)
+        })
 
     // Force a re-render to ensure the alert is displayed
     setTimeout(() => {

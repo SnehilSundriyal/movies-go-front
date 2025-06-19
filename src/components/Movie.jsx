@@ -1,24 +1,46 @@
 import React, {useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
-import TheGodfather from "../images/godfather.jpg";
 
 const Movie = () => {
-  const [movie, setMovie] = useState([]);
+  const [movie, setMovie] = useState({});
   let { id } = useParams();
 
-  useEffect(() => {
-    let myMovie = {
-        id: 2,
-        title: "The Godfather",
-        poster: TheGodfather,
-        run_time: 175,
-        imdb: 9.2,
-        release_date: 1972,
-        mpaa: "R",
-        description: "Don Vito Corleone, head of a mafia family, decides to hand over his empire to his youngest son, Michael. However, his decision unintentionally puts the lives of his loved ones in grave danger."
+    useEffect(() => {
+        if (!id) {
+            console.error("No movie ID found");
+            return;
+        }
+
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+
+        const requestOptions = {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({id: parseInt(id)})
+        };
+
+        fetch(`http://localhost:8080/movie`, requestOptions)
+            .then((response) => {
+                console.log("Response status:", response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setMovie(data);
+            })
+            .catch((error) => {
+                console.error("Fetch error:", error);
+            });
+    }, [id]);
+
+    // Add loading state
+    if (!movie.id) {console.log('IMDB Rating:', movie.imdb);
+        return <div>Loading...</div>;
     }
-    setMovie(myMovie);
-  }, [id])
+
 
   return (
     <>
@@ -28,8 +50,8 @@ const Movie = () => {
         </div>
         <div className="ml-3">
           <h2 className="text-4xl font-extrabold">{movie.title}</h2>
-          <p className="text-xl text-gray-400 mt-2">{movie.release_date} • {movie.run_time} min • {movie.mpaa} rated</p>
-          <a href="https://www.imdb.com/title/tt0068646/?ref_=nv_sr_srsg_0_tt_7_nm_1_in_0_q_the%2520godfath" className="mt-2">
+          <p className="text-xl text-gray-400 mt-2">{movie.release} • {movie.runtime}h {movie.runtime_minutes}min • {movie.mpaa} rated</p>
+          <a href={`https://www.imdb.com/title/${movie.imdbId}`} className="mt-2">
               <button className="btn btn-lg bg-[#F5C518] flex items-center justify-start gap-3 mt-4 text-black">
                 <svg
                   version="1.1"
