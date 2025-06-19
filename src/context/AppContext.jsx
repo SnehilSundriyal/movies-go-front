@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import {useNavigate} from "react-router-dom";
+import Cross from "./../images/x-mark.png";
+import Check from "./../images/check-mark.png";
 
 // Create a context for the app
 const AppContext = createContext();
 
-// Create a provider component
 export const AppProvider = ({ children }) => {
-  // Initialize jwt from localStorage if available
   const [jwt, setJwt] = useState(() => {
     return localStorage.getItem('jwt') || "";
   });
@@ -14,6 +14,9 @@ export const AppProvider = ({ children }) => {
   const [alertClass, setAlertClass] = useState("d-none");
   const [iconSrc, setIconSrc] = useState("");
   const [alertTimeout, setAlertTimeout] = useState(null);
+
+  const [ticking, setTicking] = useState(false);
+  const [tickInterval, setTickInterval] = useState("");
 
   const navigate = useNavigate();
 
@@ -27,8 +30,23 @@ export const AppProvider = ({ children }) => {
   }, [jwt]);
 
   const Logout = () => {
-    setJwt("");
-    navigate('/login');
+    const requestOptions = {
+      method: "GET",
+      credentials: "include",
+    }
+
+    fetch(`http://localhost:8080/logout`, requestOptions)
+        .catch(error => {
+          setAlert("Error logging out" + toString(error), "alert-danger", Cross)
+        })
+        .finally(() => {
+          setJwt("");
+          navigate("/login");
+          setTimeout(() => {
+            setAlert("Logged out successfully!", "alert-success", Check);
+          }, 100)
+        })
+
   }
 
   // Clear any existing timeout when component unmounts
@@ -69,7 +87,11 @@ export const AppProvider = ({ children }) => {
     alertClass, setAlertClass,
     iconSrc, setIconSrc,
     setAlert,
-    Logout
+    Logout,
+    ticking,
+    setTicking,
+    setTickInterval,
+    tickInterval
   };
 
   return (

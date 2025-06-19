@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import "./app.css";
 import {Link, Outlet} from "react-router-dom";
 import Alert from "./components/Alert.jsx";
 import { useAppContext } from './context/AppContext';
 import Logo from "./../public/vite.svg";
+import Cross from "./images/x-mark.png";
+import Button from "daisyui/components/button/index.js";
 
 function App() {
   const {
@@ -11,8 +13,52 @@ function App() {
     alertMessage,
     alertClass,
     iconSrc,
-    Logout
+    setJwt,
+    Logout,
+    setAlert,
+    ticking,
+    setTickInterval,
+    tickInterval,
+    setTicking,
   } = useAppContext();
+
+  useEffect(() => {
+    const requestOptions = {
+      method: "GET",
+      credentials: "include",
+    }
+
+    fetch(`http://localhost:8080/refresh`, requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.access_token) {
+            setJwt(data.access_token);
+          }
+        })
+        .catch(error => {
+          setAlert(error, "alert-error", Cross)
+        })
+  })
+
+  const toggleRefresh = () => {
+    console.log("clicked");
+    if (!ticking) {
+      console.log("turning on ticking");
+      let i = setInterval(() => {
+        console.log("this will run every second");
+
+      }, 1000);
+      setTickInterval(i);
+      console.log("setting tick interval to", i);
+      setTicking(true);
+    } else {
+      console.log("turning off ticking")
+      console.log("turning off tickInterval", tickInterval);
+      setTickInterval(null);
+      clearInterval(tickInterval);
+      setTicking(false);
+    }
+}
 
   return (
       <>
@@ -139,6 +185,7 @@ function App() {
             </div>
 
             <div className="flex-1">
+              <button className="btn btn-soft btn-warning" href="#!" onClick={toggleRefresh}>Toggle ticking</button>
               <Alert message={alertMessage} class={alertClass} iconSrc={iconSrc} />
               <Outlet />
             </div>
