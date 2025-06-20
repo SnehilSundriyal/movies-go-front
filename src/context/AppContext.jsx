@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import Cross from "./../images/x-mark.png";
 import Check from "./../images/check-mark.png";
 
-// Create a context for the app
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
@@ -14,13 +13,8 @@ export const AppProvider = ({ children }) => {
   const [alertClass, setAlertClass] = useState("d-none");
   const [iconSrc, setIconSrc] = useState("");
   const [alertTimeout, setAlertTimeout] = useState(null);
-
-  const [ticking, setTicking] = useState(false);
   const [tickInterval, setTickInterval] = useState("");
 
-  const navigate = useNavigate();
-
-  // Update localStorage when jwt changes
   useEffect(() => {
     if (jwt) {
       localStorage.setItem('jwt', jwt);
@@ -28,6 +22,16 @@ export const AppProvider = ({ children }) => {
       localStorage.removeItem('jwt');
     }
   }, [jwt]);
+
+  useEffect(() => {
+    return () => {
+      if (alertTimeout) {
+        clearTimeout(alertTimeout);
+      }
+    };
+  }, [alertTimeout]);
+
+  const navigate = useNavigate();
 
   const Logout = () => {
     const requestOptions = {
@@ -46,31 +50,41 @@ export const AppProvider = ({ children }) => {
             setAlert("Logged out successfully!", "alert-success", Check);
           }, 100)
         })
-
   }
 
-  // Clear any existing timeout when component unmounts
-  useEffect(() => {
-    return () => {
-      if (alertTimeout) {
-        clearTimeout(alertTimeout);
-      }
-    };
-  }, [alertTimeout]);
+  const ToggleRefresh = useCallback((status) => {
+    if (status) {
+      let i = setInterval(() => {
+        const requestOptions = {
+          method: "GET",
+          credentials: "include",
+        }
+        fetch(`http://localhost:8080/refresh`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.access_token) {
+                setJwt(data.access_token);
+              }
+            })
+            .catch(error => {
+              setAlert("error logging in", "alert-error", Cross)
+            })      }, 600000);
+      setTickInterval(i);
+    } else {
+      setTickInterval(null);
+      clearInterval(tickInterval);
+    }
+  }, [tickInterval])
 
-  // Function to set alert and automatically clear it after 3 seconds
   const setAlert = useCallback((message, className, icon) => {
-    // Clear any existing timeout
     if (alertTimeout) {
       clearTimeout(alertTimeout);
     }
 
-    // Set the alert
     setAlertMessage(message);
     setAlertClass(className);
     setIconSrc(icon);
 
-    // Set a timeout to clear the alert after 6 seconds
     const timeout = setTimeout(() => {
       setAlertMessage("");
       setAlertClass("d-none");
@@ -80,18 +94,16 @@ export const AppProvider = ({ children }) => {
     setAlertTimeout(timeout);
   }, [alertTimeout]);
 
-  // Values to be provided to consuming components
   const contextValue = {
     jwt, setJwt,
     alertMessage, setAlertMessage,
     alertClass, setAlertClass,
     iconSrc, setIconSrc,
     setAlert,
-    Logout,
-    ticking,
-    setTicking,
     setTickInterval,
-    tickInterval
+    tickInterval,
+    Logout,
+    ToggleRefresh,
   };
 
   return (
@@ -101,7 +113,6 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use the app context
 export const useAppContext = () => {
   return useContext(AppContext);
 };

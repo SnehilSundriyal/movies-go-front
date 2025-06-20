@@ -17,7 +17,8 @@ const Login = () => {
     alertClass, 
     iconSrc, 
     setJwt, 
-    setAlert 
+    setAlert,
+    ToggleRefresh,
   } = useAppContext();
 
   const handleSubmit = (event) => {
@@ -45,6 +46,7 @@ const Login = () => {
           } else {
             setJwt(data.access_token)
             setAlert("Logged in successfully!", "alert-success", Check)
+            ToggleRefresh(true);
             setTimeout(() => {
               navigate("/")
             }, 2000)
