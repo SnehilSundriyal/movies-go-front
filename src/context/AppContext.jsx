@@ -67,7 +67,7 @@ export const AppProvider = ({ children }) => {
               }
             })
             .catch(error => {
-              setAlert("error logging in", "alert-error", Cross)
+              setAlert(error, "alert-error", Cross)
             })      }, 600000);
       setTickInterval(i);
     } else {

@@ -12,6 +12,7 @@ import EditMovie from "./components/EditMovie.jsx";
 import Movie from "./components/Movie.jsx";
 import ManageCatalogue from "./components/ManageCatalogue.jsx";
 import { AppProvider } from './context/AppContext';
+// adjust path if needed
 
 // Wrap App component with AppProvider
 const AppWithProvider = () => (

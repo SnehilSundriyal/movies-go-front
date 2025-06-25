@@ -5,7 +5,7 @@ import Alert from "./components/Alert.jsx";
 import { useAppContext } from './context/AppContext';
 import Logo from "./../public/vite.svg";
 import Cross from "./images/x-mark.png";
-import Check from "./images/check-mark.png";
+import './styles/fonts.css';
 
 function App() {
   const {
@@ -35,15 +35,15 @@ function App() {
             }
           })
           .catch(error => {
-            setAlert(error, "alert-error", Cross)
+            setAlert(error.messageasae3wa, "alert-error", Cross)
           })
     }
 
-  }, [jwt, ToggleRefresh()])
+  }, [jwt, ToggleRefresh])
 
   return (
       <>
-        <div className="max-w-7xl mx-auto px-4 mt-3">
+        <div className="max-w-7xl mx-auto px-4 mt-3 font-sf">
 
           <div className="flex flex-nowrap items-center justify-between">
             <Link to="/">
