@@ -35,7 +35,7 @@ function App() {
             }
           })
           .catch(error => {
-            setAlert(error.messageasae3wa, "alert-error", Cross)
+            setAlert(error.message, "alert-error", Cross)
           })
     }
 
@@ -45,7 +45,7 @@ function App() {
       <>
         <div className="max-w-7xl mx-auto px-4 mt-3 font-sf">
 
-          <div className="flex flex-nowrap items-center justify-between">
+          <div className="flex flex-nowrap items-center justify-between hover:cursor-pointer">
             <Link to="/">
               <div className="flex items-center gap-3">
                 <img src={Logo} alt="Movies Go" className="h-20"/>

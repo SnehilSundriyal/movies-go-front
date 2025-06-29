@@ -44,12 +44,12 @@ const Movie = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 mb-3">
-        <div className="h-[500px] w-[350px] col-end-1">
+      <div className="grid grid-cols-3 gap-4 mb-3">
+        <div className="h-[500px] w-[350px]">
           <img src={movie.poster} alt="movie-poster"/>
         </div>
-        <div className="ml-3">
-          <h2 className="text-4xl font-extrabold">{movie.title}</h2>
+        <div className="ml-7 col-span-2">
+          <h2 className="text-4xl font-bold">{movie.title}</h2>
           <p className="text-xl text-gray-400 mt-2">{movie.release} • {movie.runtime}h {movie.runtime_minutes}min • {movie.mpaa} rated</p>
           <a href={`https://www.imdb.com/title/${movie.imdbId}`} className="mt-2">
               <button className="btn btn-lg bg-[#F5C518] flex items-center justify-start gap-3 mt-4 text-black">
