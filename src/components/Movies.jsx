@@ -79,7 +79,7 @@ const Movies = () => {
                       <form method="dialog">
                         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                       </form>
-                      <h3 className="font-bold text-xl">{m.title}'s Description</h3>
+                      <h3 className="font-bold text-xl">Description for {m.title}</h3>
                       <p className="py-4 text-md">{m.description}</p>
                     </div>
                   </dialog>

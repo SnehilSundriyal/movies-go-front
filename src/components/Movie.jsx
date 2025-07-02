@@ -4,39 +4,31 @@ import {Link, useParams} from "react-router-dom";
 const Movie = () => {
   const [movie, setMovie] = useState({});
   let { id } = useParams();
-
     useEffect(() => {
-        if (!id) {
-            console.error("No movie ID found");
-            return;
-        }
-
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
 
         const requestOptions = {
-            method: "POST",
+            method: "GET",
             headers: headers,
-            body: JSON.stringify({id: parseInt(id)})
-        };
+        }
 
-        fetch(`http://localhost:8080/movie`, requestOptions)
-            .then((response) => {
-                console.log("Response status:", response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
+        fetch(`http://localhost:8080/movies/${id}`, requestOptions)
+            .then((response) => response.json())
+            .then ((data) => {
                 setMovie(data);
             })
-            .catch((error) => {
-                console.error("Fetch error:", error);
-            });
-    }, [id]);
+            .catch(err => {
+                console.log(err)
+            })
+    }, [id])
 
-    // Add loading state
+    if (movie.genres) {
+        movie.genres = Object.values(movie.genres);
+    } else {
+        movie.genres = [];
+    }
+
     if (!movie.id) {console.log('IMDB Rating:', movie.imdb);
         return <div>Loading...</div>;
     }
@@ -51,8 +43,11 @@ const Movie = () => {
         <div className="ml-7 col-span-2">
           <h2 className="text-4xl font-bold">{movie.title}</h2>
           <p className="text-xl text-gray-400 mt-2">{movie.release} • {movie.runtime}h {movie.runtime_minutes}min • {movie.mpaa} rated</p>
+          <div className="mt-2 text-lg text-gray-400">
+            {movie.genres.map(g => g.genre).join(' • ')}
+          </div>
           <a href={`https://www.imdb.com/title/${movie.imdbId}`} className="mt-2">
-              <button className="btn btn-lg bg-[#F5C518] flex items-center justify-start gap-3 mt-4 text-black">
+          <button className="btn btn-lg bg-[#F5C518] flex items-center justify-start gap-3 mt-4 text-black">
                 <svg
                   version="1.1"
                   id="Layer_1"
@@ -85,12 +80,10 @@ const Movie = () => {
           </a>
         </div>
       </div>
-
-      {/* Full-width description section spanning both columns */}
       <hr/>
       <div className="mt-4">
-        <h3 className="text-2xl font-bold mb-3">Description</h3>
-        <p className="text-base leading-relaxed text-gray-400">
+        <h3 className="text-3xl font-bold mb-3">Description</h3>
+        <p className="text-lg leading-relaxed text-gray-400">
           {movie.description}
         </p>
       </div>

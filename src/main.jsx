@@ -44,6 +44,10 @@ const router = createBrowserRouter([
         element: <GraphQL />
       },
       {
+        path: '/admin/movie/0',
+        element: <EditMovie />
+      },
+      {
         path: '/admin/movie/:id',
         element: <EditMovie />
       },
