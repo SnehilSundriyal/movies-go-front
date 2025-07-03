@@ -4,15 +4,14 @@ import {useAppContext} from "../context/AppContext.jsx";
 import Input from "./form/Input.jsx";
 import Select from "./form/Select.jsx";
 import TextArea from "./form/TextArea.jsx";
-import FileInput from "./form/FileInput.jsx";
 import Checkbox from "./form/Checkbox.jsx";
 import Cross from "./../images/x-mark.png"
 
 const EditMovie = () => {
     const navigate = useNavigate();
     const {
-        jwtToken,
-      setAlert,
+        jwt,
+        setAlert,
     } = useAppContext();
 
     const [error, setError] = useState(null);
@@ -34,11 +33,11 @@ const EditMovie = () => {
     const [movie, setMovie] = useState({
         id: 0,
         title: "",
-        release: "",
-        runtime: "",
-        imdb: "",
-        imdb_link: "",
-        mpaa_rating: "",
+        release: null,
+        runtime: null,
+        imdb: null,
+        IMDbID: "",
+        mpaa: "",
         description: "",
         genres_array: [Array(13).fill(false)],
     })
@@ -49,7 +48,7 @@ const EditMovie = () => {
         id = 0;
     }
     useEffect(() => {
-        if (jwtToken === "") {
+        if (jwt === "") {
             navigate("/login");
             return;
         }
@@ -58,12 +57,11 @@ const EditMovie = () => {
             setMovie({
                 id: 0,
                 title: "",
-                release: "",
-                runtime: "",
-                runtime_minutes: "",
-                imdb: "",
-                imdb_link: "",
-                mpaa_rating: "",
+                release: null,
+                runtime: null,
+                imdb: null,
+                IMDbID: "",
+                mpaa: "",
                 description: "",
                 genres_array: [Array(13).fill(false)],
             })
@@ -96,7 +94,7 @@ const EditMovie = () => {
 
         }
 
-    }, [id, jwtToken, navigate])
+    }, [id, jwt, navigate])
 
     const handleChange = () => (event) => {
         let value = event.target.value;
@@ -137,21 +135,20 @@ const EditMovie = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const formData = new FormData();
-
         let errors = [];
         let required = [
             {field: movie.title, name: "title"},
             {field: movie.release, name: "release"},
             {field: movie.runtime, name: "runtime"},
             {field: movie.imdb, name: "imdb"},
-            {field: movie.imdb_link, name: "imdb_link"},
+            {field: movie.IMDbID, name: "IMDbID"},
             {field: movie.description, name: "description"},
-            {field: movie.mpaa_rating, name: "mpaa_rating"},
+            {field: movie.mpaa, name: "mpaa"},
             {field: movie.poster, name: "movie_poster"}
         ]
+
         required.forEach(function(obj) {
-            if (obj.field === "") {
+            if (obj.field === "" || obj.field === null) {
                 errors.push(obj.name);
             }
         })
@@ -162,43 +159,84 @@ const EditMovie = () => {
             navigate("/admin/movie/0");
         }
 
-
         setErrors(errors);
         if (errors.length > 0) {
             return false;
         }
 
-        Object.keys(movie).forEach(key => {
-            formData.append(key, movie[key]);
-        });
+        // Create a copy of movie with converted numeric fields
+        const movieData = {
+            ...movie,
+            release: parseInt(movie.release, 10),
+            runtime: parseInt(movie.runtime, 10),
+            imdb: parseFloat(movie.imdb)
+        };
 
-        if (posterFile) {
-            formData.append('poster', posterFile);
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        headers.append("Authorization", "Bearer " + jwt);
+
+        let method = "PUT";
+        if (movie.id > 0) {
+            method = "PATCH";
         }
 
-        try {
-            const response = await fetch('/api/movies', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${jwtToken}`,
-                },
-                body: formData
-            });
-
-            if (response.ok) {
-                // Handle success
-                navigate('/movies'); // or wherever you want to redirect
-            } else {
-                // Handle error
-                const errorData = await response.json();
-                setErrors(errorData.errors || []);
-                setError(errorData.message || 'An error occurred');
-            }
-        } catch (err) {
-            setError('Failed to save movie');
-            console.error('Error saving movie:', err);
+        let requestOptions = {
+            body: JSON.stringify(movieData), // Use movieData instead of movie
+            method: method,
+            headers: headers,
+            credentials: "include",
         }
+
+        fetch(`http://localhost:8080/admin/movies/${movie.id}`, requestOptions)
+          .then((response) => response.json())
+          .then((data) => {
+              if (data.error) {
+                  console.log(data.error)
+              } else {
+                  navigate("/admin/manage-catalogue");
+              }
+          })
+          .catch(err => {
+              console.log(err);
+          })
     }
+
+
+
+
+        //
+        // Object.keys(movie).forEach(key => {
+        //     formData.append(key, movie[key]);
+        // });
+        //
+        // if (posterFile) {
+        //     formData.append('poster', posterFile);
+        // }
+        //
+        // try {
+        //     const response = await fetch('/api/movies', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Authorization': `Bearer ${jwt}`,
+        //         },
+        //         body: formData
+        //     });
+        //
+        //     if (response.ok) {
+        //         // Handle success
+        //         navigate('/movies'); // or wherever you want to redirect
+        //     } else {
+        //         // Handle error
+        //         const errorData = await response.json();
+        //         setErrors(errorData.errors || []);
+        //         setError(errorData.message || 'An error occurred');
+        //     }
+        // } catch (err) {
+        //     setError('Failed to save movie');
+        //     console.error('Error saving movie:', err);
+        // }
+
 
     return (
       <div>
@@ -247,13 +285,13 @@ const EditMovie = () => {
                       <div>
                           <Select
                             title={"MPAA Rating"}
-                            name={"mpaa_rating"}
+                            name={"mpaa"}
                             options={mpaaRatings}
-                            value={movie.mpaa_rating}
+                            value={movie.mpaa}
                             placeHolder={"Choose MPAA Rating"}
-                            onChange={handleChange("mpaa_rating")}
+                            onChange={handleChange("mpaa")}
                             errorMsg={"Please choose."}
-                            errorDiv={hasError("mpaa_rating") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
+                            errorDiv={hasError("mpaa") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
                           />
                       </div>
                       <div>
@@ -275,10 +313,10 @@ const EditMovie = () => {
                     title={"IMDB Link"}
                     className={"block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"}
                     type={"text"}
-                    name={"imdb_link"}
-                    value={movie.imdb_link}
-                    onChange={handleChange("imdb_link")}
-                    errorDiv={hasError("imdb_link") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
+                    name={"IMDbID"}
+                    value={movie.IMDbID}
+                    onChange={handleChange("IMDbID")}
+                    errorDiv={hasError("IMDbID") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
                     errorMsg={"Please paste the IMDB Link."}
                   />
                   <br/>
@@ -294,13 +332,13 @@ const EditMovie = () => {
                   />
                   <br/>
 
-                  <FileInput
-                    title="Upload Movie Poster"
-                    name="poster"
-                    onChange={handleFileChange}
-                    errorDiv={hasError("movie_poster") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
-                    errorMsg={"Please select a poster image."}
-                  />
+                  {/*<FileInput*/}
+                  {/*  title="Upload Movie Poster"*/}
+                  {/*  name="poster"*/}
+                  {/*  onChange={handleFileChange}*/}
+                  {/*  errorDiv={hasError("movie_poster") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}*/}
+                  {/*  errorMsg={"Please select a poster image."}*/}
+                  {/*/>*/}
 
                   {movie.genres && movie.genres.length > 0 ? (
                     <div className="rounded-lg border border-gray-300 p-6 mb-4">

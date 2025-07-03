@@ -5,18 +5,17 @@ import {useAppContext} from "../context/AppContext.jsx";
 const ManageCatalogue = () => {
     const [movies, setMovies] = useState([]);
 
-    const { jwtToken } = useAppContext();
+    const { jwt } = useAppContext();
     const navigate = useNavigate();
 
     useEffect(() => {
-        console.log("")
-        if (jwtToken === "") {
+        if (jwt === "") {
             navigate("/login");
             return;
         }
         const headers = new Headers();
         headers.append("Content-Type", "application/json")
-        headers.append("Authorization", "Bearer " + jwtToken)
+        headers.append("Authorization", "Bearer " + jwt)
 
         const requestOptions = {
             method: "GET",
@@ -29,7 +28,7 @@ const ManageCatalogue = () => {
                 setMovies(data);
             })
             .catch((error) => console.log(error));
-    }, [jwtToken, navigate]);
+    }, [jwt, navigate]);
 
 
     return (

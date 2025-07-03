@@ -38,7 +38,7 @@ const Movie = () => {
     <>
       <div className="grid grid-cols-3 gap-4 mb-3">
         <div className="h-[500px] w-[350px]">
-          <img src={movie.poster} alt="movie-poster"/>
+          <img src={movie.poster} alt="movie-poster" className="w-full h-full object-cover"/>
         </div>
         <div className="ml-7 col-span-2">
           <h2 className="text-4xl font-bold">{movie.title}</h2>
