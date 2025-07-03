@@ -6,11 +6,13 @@ import Select from "./form/Select.jsx";
 import TextArea from "./form/TextArea.jsx";
 import FileInput from "./form/FileInput.jsx";
 import Checkbox from "./form/Checkbox.jsx";
+import Cross from "./../images/x-mark.png"
 
 const EditMovie = () => {
     const navigate = useNavigate();
     const {
-        jwtToken
+        jwtToken,
+      setAlert,
     } = useAppContext();
 
     const [error, setError] = useState(null);
@@ -58,6 +60,7 @@ const EditMovie = () => {
                 title: "",
                 release: "",
                 runtime: "",
+                runtime_minutes: "",
                 imdb: "",
                 imdb_link: "",
                 mpaa_rating: "",
@@ -81,7 +84,7 @@ const EditMovie = () => {
                       checks.push({id: g.id, checked: false, genre: g.genre});
                   })
                   setMovie(m => ({
-                      ...movie,
+                      ...m,
                       genres: checks,
                       genres_array: [],
                   }))
@@ -109,6 +112,22 @@ const EditMovie = () => {
         console.log("value in handlecheck: ", event.target.value);
         console.log("checked is", event.target.checked);
         console.log("position is", position);
+
+        let tmpArr = movie.genres;
+        tmpArr[position].checked = !tmpArr[position].checked;
+
+        let tmpIDs = movie.genres_array;
+        if (!event.target.checked) {
+            tmpIDs.splice(tmpIDs.indexOf(event.target.value));
+        } else {
+            tmpIDs.push(parseInt(event.target.value, 10));
+        }
+
+        setMovie({
+            ...movie,
+            genres_array: tmpIDs,
+        })
+
     }
 
     const handleFileChange = (file) => {
@@ -118,26 +137,50 @@ const EditMovie = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Create FormData object to handle file upload
         const formData = new FormData();
 
-        // Append movie data
+        let errors = [];
+        let required = [
+            {field: movie.title, name: "title"},
+            {field: movie.release, name: "release"},
+            {field: movie.runtime, name: "runtime"},
+            {field: movie.imdb, name: "imdb"},
+            {field: movie.imdb_link, name: "imdb_link"},
+            {field: movie.description, name: "description"},
+            {field: movie.mpaa_rating, name: "mpaa_rating"},
+            {field: movie.poster, name: "movie_poster"}
+        ]
+        required.forEach(function(obj) {
+            if (obj.field === "") {
+                errors.push(obj.name);
+            }
+        })
+
+        if (movie.genres_array.length === 0) {
+            setAlert("You need to select atleast one genre.", "alert-error", Cross)
+            errors.push("genres");
+            navigate("/admin/movie/0");
+        }
+
+
+        setErrors(errors);
+        if (errors.length > 0) {
+            return false;
+        }
+
         Object.keys(movie).forEach(key => {
             formData.append(key, movie[key]);
         });
 
-        // Append poster file if selected
         if (posterFile) {
             formData.append('poster', posterFile);
         }
 
         try {
-            // Example API call - adjust URL and headers as needed
             const response = await fetch('/api/movies', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`,
-                    // Don't set Content-Type header - let browser set it with boundary for FormData
                 },
                 body: formData
             });
@@ -160,6 +203,7 @@ const EditMovie = () => {
     return (
       <div>
           <h2 className="text-4xl font-medium mb-4">Add/Edit Movie</h2>
+          {/*<pre>{JSON.stringify(movie, null, 3)}</pre>*/}
           <form onSubmit={handleSubmit}>
               <input type="hidden" name="id" value={movie.id} id="id"/>
 
@@ -254,15 +298,15 @@ const EditMovie = () => {
                     title="Upload Movie Poster"
                     name="poster"
                     onChange={handleFileChange}
-                    errorDiv={hasError("poster") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
+                    errorDiv={hasError("movie_poster") ? "p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" : "d-none"}
                     errorMsg={"Please select a poster image."}
                   />
 
                   {movie.genres && movie.genres.length > 0 ? (
-                    <div className="rounded-lg border border-gray-300 p-6">
+                    <div className="rounded-lg border border-gray-300 p-6 mb-4">
                         <fieldset>
                             <legend className="text-base font-semibold text-gray-400">Check relevant genres</legend>
-                            <div className="mt-4 space-y-2">
+                            <div className="mt-4 space-y-2 grid grid-cols-4">
                                 {movie.genres.map((g, index) => (
                                   <Checkbox
                                     key={`genre-${g.id}`}
@@ -284,6 +328,7 @@ const EditMovie = () => {
                     </div>
                   )}
               </div>
+              <button className="btn btn-soft btn-success mt-4 mb-20 justify-center">Upload Movie</button>
           </form>
       </div>
     )
