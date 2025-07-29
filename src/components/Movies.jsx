@@ -24,7 +24,7 @@ const Movies = () => {
 
     return (
       <div>
-        <h2 className="text-4xl font-medium mb-4">Movie List</h2>
+        <h2 className="text-4xl font-medium mb-5">Movie List</h2>
         <hr/>
         <div className="overflow-x-auto">
           <table className="table">
