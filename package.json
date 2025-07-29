@@ -1,7 +1,7 @@
 {
   "name": "watch-a-movie",
   "private": true,
-  "proxy": "http://localhost:8080",
+  "proxy": "${process.env.REACT_APP_BACKEND}",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

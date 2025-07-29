@@ -38,7 +38,7 @@ const Login = () => {
       body: JSON.stringify(payload)
     }
 
-    fetch(`http://localhost:8080/authenticate`, requestOptions)
+    fetch(`${process.env.REACT_APP_BACKEND}/authenticate`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {

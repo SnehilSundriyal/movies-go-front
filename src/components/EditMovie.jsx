@@ -74,7 +74,7 @@ const EditMovie = () => {
                 headers: headers,
             }
 
-            fetch(`http://localhost:8080/genres`, requestOptions)
+            fetch(`${process.env.REACT_APP_BACKEND}/genres`, requestOptions)
               .then((response) => response.json())
               .then((data) => {
                   const checks = [];
@@ -188,7 +188,7 @@ const EditMovie = () => {
             credentials: "include",
         }
 
-        fetch(`http://localhost:8080/admin/movies/${movie.id}`, requestOptions)
+        fetch(`${process.env.REACT_APP_BACKEND}/admin/movies/${movie.id}`, requestOptions)
           .then((response) => response.json())
           .then((data) => {
               if (data.error) {
