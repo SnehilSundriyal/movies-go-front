@@ -26,7 +26,7 @@ function App() {
         credentials: "include",
       }
 
-      fetch(`${process.env.REACT_APP_BACKEND}/refresh`, requestOptions)
+      fetch(`http://localhost:8080/refresh`, requestOptions)
           .then((response) => response.json())
           .then((data) => {
             if (data.access_token) {

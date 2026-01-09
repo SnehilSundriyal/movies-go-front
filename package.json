@@ -1,7 +1,6 @@
 {
   "name": "watch-a-movie",
   "private": true,
-  "proxy": "${process.env.REACT_APP_BACKEND}",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
