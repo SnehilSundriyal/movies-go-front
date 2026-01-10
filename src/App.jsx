@@ -7,6 +7,8 @@ import Logo from "./../public/vite.svg";
 import Cross from "./images/x-mark.png";
 import './styles/fonts.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function App() {
   const {
     jwt,
@@ -26,7 +28,7 @@ function App() {
         credentials: "include",
       }
 
-      fetch(`http://localhost:8080/refresh`, requestOptions)
+      fetch(`${API_URL}/refresh`, requestOptions)
           .then((response) => response.json())
           .then((data) => {
             if (data.access_token) {

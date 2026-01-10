@@ -7,6 +7,9 @@ import TextArea from "./form/TextArea.jsx";
 import Checkbox from "./form/Checkbox.jsx";
 import Cross from "./../images/x-mark.png"
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
 const EditMovie = () => {
     const navigate = useNavigate();
     const {
@@ -74,7 +77,7 @@ const EditMovie = () => {
                 headers: headers,
             }
 
-            fetch(`http://localhost:8080/genres`, requestOptions)
+            fetch(`${API_URL}/genres`, requestOptions)
               .then((response) => response.json())
               .then((data) => {
                   const checks = [];
@@ -188,7 +191,7 @@ const EditMovie = () => {
             credentials: "include",
         }
 
-        fetch(`http://localhost:8080/admin/movies/${movie.id}`, requestOptions)
+        fetch(`${API_URL}/admin/movies/${movie.id}`, requestOptions)
           .then((response) => response.json())
           .then((data) => {
               if (data.error) {

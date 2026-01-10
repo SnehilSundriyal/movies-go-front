@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Movie = () => {
   const [movie, setMovie] = useState({});
   let { id } = useParams();
@@ -13,7 +15,7 @@ const Movie = () => {
             headers: headers,
         }
 
-        fetch(`http://localhost:8080/movies/${id}`, requestOptions)
+        fetch(`${API_URL}/movies/${id}`, requestOptions)
             .then((response) => response.json())
             .then ((data) => {
                 setMovie(data);

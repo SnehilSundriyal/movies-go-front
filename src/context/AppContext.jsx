@@ -5,6 +5,8 @@ import Check from "./../images/check-mark.png";
 
 const AppContext = createContext();
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const AppProvider = ({ children }) => {
   const [jwt, setJwt] = useState(() => {
     return localStorage.getItem('jwt') || "";

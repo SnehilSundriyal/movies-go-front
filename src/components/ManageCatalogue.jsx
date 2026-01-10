@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {useAppContext} from "../context/AppContext.jsx";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ManageCatalogue = () => {
     const [movies, setMovies] = useState([]);
 
@@ -22,7 +24,7 @@ const ManageCatalogue = () => {
             headers: headers,
         }
 
-        fetch(`http://localhost:8080/movies`, requestOptions)
+        fetch(`${API_URL}/movies`, requestOptions)
             .then((response) => response.json())
             .then((data) => {
                 setMovies(data);

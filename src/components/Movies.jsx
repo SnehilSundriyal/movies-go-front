@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Movies = () => {
   const [movies, setMovies] = useState([]);
 
@@ -13,7 +15,7 @@ const Movies = () => {
       headers: headers,
     }
 
-      fetch(`http://localhost:8080/movies`, requestOptions)
+      fetch(`${API_URL}/movies`, requestOptions)
           .then((response) => response.json())
           .then((data) => {
               setMovies(data);

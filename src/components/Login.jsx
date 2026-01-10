@@ -7,6 +7,8 @@ import Input from "./form/Input";
 import Alert from "./Alert";
 import { useAppContext } from "../context/AppContext";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +40,7 @@ const Login = () => {
       body: JSON.stringify(payload)
     }
 
-    fetch(`http://localhost:8080/authenticate`, requestOptions)
+    fetch(`${API_URL}/authenticate`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
